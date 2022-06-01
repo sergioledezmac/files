@@ -1,0 +1,47 @@
+
+vi  /etc/dnsmasq.conf
+
+interface=eth0
+dhcp-range=10.0.0.50,10.0.0.60,4h
+dhcp-boot=/EFI/x86/bootx64.efi
+enable-tftp
+tftp-root=/srv/tftpboot
+
+
+
+mkdir -p /srv/install/SUSE/
+
+cp -a /run/media/root/SLESMOUNT.... /srv/install/SUSE/
+mv SLESX86... /15.3
+
+systemctl enable nfsserver
+systemctl restart nfsserver
+
+vi /etc/slp.reg.d/install.suse.nfs.reg
+# Register the NFS Installation Server
+service:install.suse:nfs://$HOSTNAME/srv/install/SLES/153/DVD1,en,65535
+description=NFS Repository
+
+zypper install openslp-server
+systemctl start slpd
+
+mkdir /srv/tftpboot/EFI
+mkdir /srv/tftpboot/EFI/x86
+mkdir /srv/tftpboot/EFI/x86/boot
+
+cd /srv/install/SUSE/15.3/EFI/BOOT
+cp -a bootx64.efi grub.efi MokManager.efi /srv/tftpboot/EFI/x86/
+
+cd /srv/install/SUSE/15.3/boot/x86_64/loader/
+cp -a linux initrd /srv/tftpboot/EFI/x86/boot
+
+cd /srv/tftpboot/EFI/x86
+vi grub.cfg
+
+set timeout=5
+menuentry 'INSTALACION SUSE15 SP3' {
+ linuxefi /EFI/x86/boot/linux install=nfs://10.0.0.49/srv/install/SUSE/15.3
+ initrdefi /EFI/x86/boot/initrd
+ }
+
+https://documentation.suse.com/sbp/all/html/SBP-Multi-PXE-Install/index.html#sec-setup-pxe
