@@ -1,0 +1,77 @@
+#!/bin/bash
+
+# Define las variables con las direcciones IP a verificar
+ip_guatemala_pp="8.8.8.8"
+ip_guatemala_dp="8.56.25.6"
+ip_honduras_pp="8.8.8.8"
+ip_honduras_dp="8.56.25.6"
+
+# Ejecuta los pings y guarda los resultados en variables
+ping_guatemala_pp=$(ping -c 1 $ip_guatemala_pp > /dev/null && echo "UP" || echo "DOWN")
+ping_guatemala_dp=$(ping -c 1 $ip_guatemala_dp > /dev/null && echo "UP" || echo "DOWN")
+ping_honduras_pp=$(ping -c 1 $ip_honduras_pp > /dev/null && echo "UP" || echo "DOWN")
+ping_honduras_dp=$(ping -c 1 $ip_honduras_dp > /dev/null && echo "UP" || echo "DOWN")
+
+# Crea un archivo HTML y escribe el contenido
+cat << EOF > index.html
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Ping Status</title>
+    <style>
+      .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin-top: 20px;
+      }
+      .card {
+        border: 1px solid black;
+        padding: 10px;
+        margin: 10px;
+        width: 400px;
+      }
+      .name {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+      .status-up {
+        color: green;
+        font-weight: bold;
+      }
+      .status-down {
+        color: red;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <div class="name">Guatemala</div>
+        <div class="ip">
+          PP: $ip_guatemala_pp
+          <span class="status status-$ping_guatemala_pp">STATUS</span>
+        </div>
+        <div class="ip">
+          DP: $ip_guatemala_dp
+          <span class="status status-$ping_guatemala_dp">STATUS</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="name">Honduras</div>
+        <div class="ip">
+          PP: $ip_honduras_pp
+          <span class="status status-$ping_honduras_pp">STATUS</span>
+        </div>
+        <div class="ip">
+          DP: $ip_honduras_dp
+          <span class="status status-$ping_honduras_dp">STATUS</span>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+EOF
